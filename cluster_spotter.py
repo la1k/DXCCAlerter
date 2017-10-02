@@ -59,6 +59,20 @@ def frequency_to_band(freq):
         band = None
     return band
 
+# Map callsign to DXCC number, locator, ..
+def query_dxcc_info(callsign, api_key):
+    return json.load(urllib2.urlopen("https://secure.clublog.org/dxcc?call=%s&api=%s&full=1" % (callsign,api_key)))
+
+# Check if DXCC on frequency is in matrix
+def dxcc_in_matrix(dxcc, band, matrix_filename):
+    try:
+        with open(matrix_filename) as dxcc_json_data:
+            dxcc_data = json.load(dxcc_json_data)
+            dxcc_data[dxcc][band]
+            return True
+    except KeyError:
+        return False
+
 # Read config file
 config = ConfigParser.ConfigParser()
 config.readfp(open(sys.argv[1], "r"))
@@ -103,20 +117,15 @@ while (1):
         band = frequency_to_band(frequency)
 
         # Get DXCC information from clublog API
-        spotter_data = json.load(urllib2.urlopen("https://secure.clublog.org/dxcc?call=%s&api=%s&full=1" % (spotter,api_key)))
-        spotted_data = json.load(urllib2.urlopen("https://secure.clublog.org/dxcc?call=%s&api=%s&full=1" % (spotted,api_key)))
+        spotter_data = query_dxcc_info(spotter, api_key)
+        spotted_data = query_dxcc_info(spotted, api_key)
         spotted_dxcc_route = str(spotted_data["DXCC"])
 
         #note: spotted_data also contains coordinates of the spotted callsign which can be used for filtering.
 
         # Compare DXCC number to DXCC matrix, if there is an error the band has not been worked before
-        if band and spotted_dxcc_route and time_since_last_report.exceeds_threshold(spotted_dxcc_route, band):
-            try:
-                with open(dxcc_matrix_filename) as dxcc_json_data:
-                    dxcc_data = json.load(dxcc_json_data)
-                    dxcc_data[spotted_dxcc_route][band]
-            except KeyError:
-                print "New DXCC! %s (%s) at %s by %s (%s - %s) %s" % (spotted,spotted_data["Name"],frequency,spotter,spotter_data["Name"], comment, spot_time)
+        if band and spotted_dxcc_route and time_since_last_report.exceeds_threshold(spotted_dxcc_route, band) and not dxcc_in_matrix(spotted_dxcc_route, band, dxcc_matrix_filename):
+            print "New DXCC! %s (%s) at %s by %s (%s - %s) %s" % (spotted,spotted_data["Name"],frequency,spotter,spotter_data["Name"], comment, spot_time)
 
         # Compare callsign against watched list of callsigns for which we are reporting spots regardless of DXCC matrix
         if any(x in spotted for x in watched_callsigns):
