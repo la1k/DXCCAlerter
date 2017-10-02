@@ -2,9 +2,7 @@
 
 config_file="$1"
 
-# Obtain config option from config file in style
-#
-# config_option = value
+# Obtain config option from config file in style `config_option = value`
 function get_config_option()
 {
 	config_option="$1"
