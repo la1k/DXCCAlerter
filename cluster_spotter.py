@@ -6,6 +6,7 @@ import time
 import re
 import urllib2
 import json
+from ConfigParser import ConfigParser
 from math import radians, cos, sin, asin, sqrt
 
 # Class for keeping track over the time since the last time
@@ -74,7 +75,7 @@ def dxcc_in_matrix(dxcc, band, matrix_filename):
         return False
 
 # Read config file
-config = ConfigParser.ConfigParser()
+config = ConfigParser()
 config.readfp(open(sys.argv[1], "r"))
 
 # JSON DXCC matrix filename
