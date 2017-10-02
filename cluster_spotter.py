@@ -80,7 +80,7 @@ time_since_last_report = spot_timekeeper()
 # Open connection to telnet
 tn = telnetlib.Telnet(config.get(SECTION, "cluster_host"), config.get(SECTION, "cluster_port"))
 tn.read_until("login: ")
-tn.write(config.get(SECTION, "cluster_username") + "\n")
+tn.write(config.get(SECTION, "callsign") + "\n")
 
 # Define regular expressions
 callsign_pattern = "([a-z|0-9|/]+)"
