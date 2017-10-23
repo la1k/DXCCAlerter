@@ -3,6 +3,7 @@ A simple python based DX-cluster parser. The cluster output is filtered with the
 
 To run the script a config file is required. This file is used to pass user-specific information to the script, and is passed as an argument. An example config-script is shown below.
 
+```
 [spotter]
 clublog_api_key = YOUR_API_KEY
 dxcc_matrix_filename = dxcc_matrix.dat
@@ -12,6 +13,7 @@ cluster_host = la3waa.ddns.net
 cluster_port = 8000
 clublog_email = YOUR@E.MAIL
 clublog_password = YOUR_PASSWORD
+```
 
 After the config file is written the script can be run:
 
