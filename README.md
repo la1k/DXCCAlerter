@@ -18,14 +18,10 @@ clublog_password = YOUR_PASSWORD
 After the config file is written the script can be run:
 
 get_clublog_dxcc_matrix.sh fetches Club Logs DXCC matrix, this is a .json structure which contains information on which DXCCs you have worked on different bands. To obtain this information you must upload your logs to Club Log.
-
 ```
 ./get_clublog_dxcc_matrix.sh my_config.conf
-
 ```
 The python script opens a telnet connection to the telnet specified in the config file. Once the script identifies a new DXCC opportunity it will print it to the command line. 
-
 ```
 python cluster_spotter.py my_config.conf
-
 ```
