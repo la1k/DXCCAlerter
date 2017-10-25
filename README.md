@@ -15,6 +15,10 @@ matrix is obtained as a JSON structure from ClubLog and saved to a filename
 specified in the config file. Correct information here requires that logs are
 uploaded to ClubLog.
 
+The cluster spotter itself loads this file every time it is needed, so that
+e.g. a cronjob can be used to continuously update this file without restarting
+the spotter script.
+
 `./cluster_spotter.py [PATH TO CONFIG FILE]`
 
 Connect to the DXCC cluster specified in the config file and continuosly parse
@@ -23,8 +27,8 @@ against the DXCC matrix currently contained in the DXCC matrix file. New DXCC
 oppourtunities are then printed to standard output, in addition to spots for
 any watched calls.
 
-Config file
------------
+Configuration file
+------------------
 
 A configuration file is required for the scripts. The file contains the login
 information for the ClubLog API, host and port and callsign for the DX cluster,
