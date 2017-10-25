@@ -33,6 +33,9 @@ class spot_timekeeper:
         return False;
 
 # Map frequencies to ham bands between 160 and 6 m.
+#
+# \param freq Frequency in kHz
+# \return Ham radio band (e.g. 80 for 80 meters)
 def frequency_to_band(freq):
     if 1810.0<frequency<2000.0:
         band = "160"
@@ -61,10 +64,17 @@ def frequency_to_band(freq):
     return band
 
 # Map callsign to DXCC number, locator, ..
+#
+# \param callsign Callsign
+# \param api_key ClubLog API key
 def query_dxcc_info(callsign, api_key):
     return json.load(urllib2.urlopen("https://secure.clublog.org/dxcc?call=%s&api=%s&full=1" % (callsign,api_key)))
 
-# Check if DXCC on frequency is in matrix
+# Check if the DXCC has already been run on the specified band.
+#
+# \param dxcc DXCC number
+# \param band Band (e.g. 80 for 80 meters)
+# \param matrix_filename Filename for JSON structure containing DXCC information obtained from ClubLog
 def dxcc_in_matrix(dxcc, band, matrix_filename):
     try:
         with open(matrix_filename) as dxcc_json_data:
@@ -97,14 +107,14 @@ tn = telnetlib.Telnet(config.get(SECTION, "cluster_host"), config.get(SECTION, "
 tn.read_until("login: ")
 tn.write(config.get(SECTION, "callsign") + "\n")
 
-# Define regular expressions
+# Define regular expressions for obtaining callsign, frequency etc from a spot
 callsign_pattern = "([a-z|0-9|/]+)"
 frequency_pattern = "([0-9|.]+)"
 pattern = re.compile("^DX de "+callsign_pattern+":\s+"+frequency_pattern+"\s+"+callsign_pattern+"\s+(.*)\s+(\d{4}Z)", re.IGNORECASE)
 
-# Parse telnet
+# Parse DXCC cluster stream
 while (1):
-    # Check new telnet info against regular expression
+    # Obtain new spotted call
     telnet_output = tn.read_until("\n")
     match = pattern.match(telnet_output)
 
@@ -122,9 +132,9 @@ while (1):
         spotted_data = query_dxcc_info(spotted, api_key)
         spotted_dxcc_route = str(spotted_data["DXCC"])
 
-        #note: spotted_data also contains coordinates of the spotted callsign which can be used for filtering.
+        #note: spotted_data also contains coordinates of the spotted callsign which can be used for further filtering.
 
-        # Compare DXCC number to DXCC matrix, if there is an error the band has not been worked before
+        # Report the call if it has not been worked before
         if band and spotted_dxcc_route and time_since_last_report.exceeds_threshold(spotted_dxcc_route, band) and not dxcc_in_matrix(spotted_dxcc_route, band, dxcc_matrix_filename):
             print "New DXCC! %s (%s) at %s by %s (%s - %s) %s" % (spotted,spotted_data["Name"],frequency,spotter,spotter_data["Name"], comment, spot_time)
 
