@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # Script that parses DXCC-cluster telnet spots and compares them to clublogs DXCC matrix. If new DXCCs appear the user may be alerted.
 
 import sys
@@ -83,6 +85,11 @@ def dxcc_in_matrix(dxcc, band, matrix_filename):
             return True
     except KeyError:
         return False
+
+#check number of cli arguments
+if len(sys.argv) <= 1:
+    print("Usage: " + sys.argv[0] + " [CONFIG FILE]")
+    exit()
 
 # Read config file
 config = ConfigParser()
