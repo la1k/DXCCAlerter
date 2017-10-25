@@ -50,4 +50,6 @@ clublog_email = YOUR@E.MAIL
 clublog_password = YOUR_PASSWORD
 ```
 
-Copy this to e.g. `spotter_config.conf` and replace the fields by the relevant information.
+Copy this to e.g. `spotter_config.conf` and replace the fields by the relevant
+information. The path to the config file is taken in among the command line
+arguments to the scripts.
