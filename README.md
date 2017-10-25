@@ -49,3 +49,5 @@ cluster_port = 8000
 clublog_email = YOUR@E.MAIL
 clublog_password = YOUR_PASSWORD
 ```
+
+Copy this to e.g. `spotter_config.conf` and replace the fields by the relevant information.
