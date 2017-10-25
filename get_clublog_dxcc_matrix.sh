@@ -1,14 +1,31 @@
 #!/bin/bash
 
+#check cli arguments
+if [ "$#" -ne 1 ]; then
+	echo "Usage: $0 [config_file]"
+	exit
+fi
+
+#check whether file exists
 config_file="$1"
+if [ ! -e $config_file ]; then
+	echo "File $config_file does not exist"
+	exit
+fi
 
 # Obtain config option from config file in style `config_option = value`
 function get_config_option()
 {
 	config_option="$1"
-	cat $config_file | sed -rn "s/$config_option\s*=\s*(.*)/\1/p"
+	option_value=$(cat $config_file | sed -rn "s/$config_option\s*=\s*(.*)/\1/p")
+	if [[ -z "$option_value" ]]; then
+		(>&2 echo "Option $config_option does not exist in $config_file")
+		exit
+	fi
+	echo $option_value
 }
 
+#get relevant config options from config file
 API_key=$(get_config_option "clublog_api_key")
 callsign=$(get_config_option "callsign")
 email=$(get_config_option "clublog_email")
