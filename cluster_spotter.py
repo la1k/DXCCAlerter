@@ -111,7 +111,7 @@ time_since_last_report = spot_timekeeper()
 
 # Open connection to telnet
 tn = telnetlib.Telnet(config.get(SECTION, "cluster_host"), config.get(SECTION, "cluster_port"))
-tn.read_until("login: ")
+tn.read_until(":")
 tn.write(config.get(SECTION, "callsign") + "\n")
 
 # Define regular expressions for obtaining callsign, frequency etc from a spot
@@ -123,6 +123,7 @@ pattern = re.compile("^DX de "+callsign_pattern+":\s+"+frequency_pattern+"\s+"+c
 while (1):
     # Obtain new spotted call
     telnet_output = tn.read_until("\n")
+    print(telnet_output)
     match = pattern.match(telnet_output)
 
     # If there is a match, sort matches into variables
