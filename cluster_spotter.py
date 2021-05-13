@@ -12,6 +12,7 @@ import re
 from urllib.request import urlopen
 import json
 from configparser import ConfigParser
+import argparse
 
 """
 Class for keeping track over the time since the last time
@@ -122,14 +123,17 @@ def dxcc_in_matrix(dxcc, band, matrix_filename):
     except KeyError:
         return False
 
-# Check number of cli arguments
-if len(sys.argv) <= 1:
-    print("Usage: " + sys.argv[0] + " [CONFIG FILE]")
-    exit()
+# CLI arguments
+parser = argparse.ArgumentParser(description='Print watched spots and missing DXCC entities in DX cluster stream to STDOUT.')
+parser.add_argument('config_file', metavar='CONFIG_FILE', type=str,
+                    help='Path to config file (see README.md)')
+parser.add_argument('-v', dest='verbose', action='store_true',
+                    help='Verbose output (print full DX cluster output to STDERR)')
+args = parser.parse_args()
 
 # Read config file
 config = ConfigParser()
-config.readfp(open(sys.argv[1], "r"))
+config.readfp(open(args.config_file, "r"))
 
 # JSON DXCC matrix filename
 SECTION = "spotter"
@@ -159,8 +163,10 @@ pattern = re.compile("^DX de "+callsign_pattern+":\s+"+frequency_pattern+"\s+"+c
 while (1):
     # Obtain new spotted call
     telnet_output = tn.read_until(b"\n")
-    print(telnet_output)
     match = pattern.match(telnet_output.decode('ascii'))
+
+    if args.verbose:
+        print(telnet_output.decode('ascii'), file=sys.stderr)
 
     # If there is a match, sort matches into variables
     if match:
