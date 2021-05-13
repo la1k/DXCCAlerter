@@ -12,7 +12,6 @@ import re
 from urllib.request import urlopen
 import json
 from configparser import ConfigParser
-from math import radians, cos, sin, asin, sqrt
 
 """
 Class for keeping track over the time since the last time
