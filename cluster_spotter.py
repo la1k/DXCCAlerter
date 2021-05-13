@@ -19,11 +19,12 @@ Class for keeping track over the time since the last time
 a specific country and band were spotted.
 """
 class spot_timekeeper:
-    # Map over the times at which a specific (country code, band) were spotted
-    spot_times = {};
+    def __init__(self):
+        # Map over the times at which a specific (country code, band) were spotted
+        self.spot_times = {}
 
-    # Time threshold
-    threshold_seconds = 60*60
+        # Time threshold
+        threshold_seconds = 60*60
 
     """
     Check whether the time since the last spot is large enough for reporting a
