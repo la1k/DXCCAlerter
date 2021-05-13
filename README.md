@@ -21,10 +21,10 @@ the spotter script.
 
 `python3 cluster_spotter.py [PATH TO CONFIG FILE]`
 
-Connect to the DXCC cluster specified in the config file and continuosly parse
+Connect to the DXCC cluster specified in the config file and continuously parse
 for new callsigns. Callsigns are looked up against the ClubLog API and compared
 against the DXCC matrix currently contained in the DXCC matrix file. New DXCC
-oppourtunities are then printed to standard output, in addition to spots for
+opportunities are then printed to standard output, in addition to spots for
 any watched calls.
 
 Configuration file
