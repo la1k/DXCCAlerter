@@ -6,9 +6,9 @@ import sys
 import telnetlib
 import time
 import re
-import urllib2
+from urllib.request import urlopen
 import json
-from ConfigParser import ConfigParser
+from configparser import ConfigParser
 from math import radians, cos, sin, asin, sqrt
 
 # Class for keeping track over the time since the last time
@@ -70,7 +70,7 @@ def frequency_to_band(freq):
 # \param callsign Callsign
 # \param api_key ClubLog API key
 def query_dxcc_info(callsign, api_key):
-    return json.load(urllib2.urlopen("https://secure.clublog.org/dxcc?call=%s&api=%s&full=1" % (callsign,api_key)))
+    return json.load(urlopen("https://secure.clublog.org/dxcc?call=%s&api=%s&full=1" % (callsign,api_key)))
 
 # Check if the DXCC has already been run on the specified band.
 #
@@ -111,8 +111,8 @@ time_since_last_report = spot_timekeeper()
 
 # Open connection to telnet
 tn = telnetlib.Telnet(config.get(SECTION, "cluster_host"), config.get(SECTION, "cluster_port"))
-tn.read_until(":")
-tn.write(config.get(SECTION, "callsign") + "\n")
+tn.read_until(b":")
+tn.write((config.get(SECTION, "callsign") + "\n").encode('ascii'))
 
 # Define regular expressions for obtaining callsign, frequency etc from a spot
 callsign_pattern = "([a-z|0-9|/]+)"
@@ -122,9 +122,9 @@ pattern = re.compile("^DX de "+callsign_pattern+":\s+"+frequency_pattern+"\s+"+c
 # Parse DXCC cluster stream
 while (1):
     # Obtain new spotted call
-    telnet_output = tn.read_until("\n")
+    telnet_output = tn.read_until(b"\n")
     print(telnet_output)
-    match = pattern.match(telnet_output)
+    match = pattern.match(telnet_output.decode('ascii'))
 
     # If there is a match, sort matches into variables
     if match:
@@ -144,9 +144,9 @@ while (1):
 
         # Report the call if it has not been worked before
         if band and spotted_dxcc_route and time_since_last_report.exceeds_threshold(spotted_dxcc_route, band) and not dxcc_in_matrix(spotted_dxcc_route, band, dxcc_matrix_filename):
-            print "New DXCC! %s (%s) at %s by %s (%s - %s) %s" % (spotted,spotted_data["Name"],frequency,spotter,spotter_data["Name"], comment, spot_time)
+            print("New DXCC! {} ({}) at {} by {} ({} - {}) {}".format(spotted,spotted_data["Name"],frequency,spotter,spotter_data["Name"], comment, spot_time))
 
         # Compare callsign against watched list of callsigns for which we are reporting spots regardless of DXCC matrix
         if any(x in spotted for x in watched_callsigns):
-            print "%s at %s by %s (%s) %s" % (spotted,frequency,spotter,comment,spot_time)
+            print("{} at {} by {} ({}) {}".format(spotted,frequency,spotter,comment,spot_time))
 
