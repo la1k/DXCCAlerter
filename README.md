@@ -19,7 +19,7 @@ The cluster spotter itself loads this file every time it is needed, so that
 e.g. a cronjob can be used to continuously update this file without restarting
 the spotter script.
 
-`./cluster_spotter.py [PATH TO CONFIG FILE]`
+`python3 cluster_spotter.py [PATH TO CONFIG FILE]`
 
 Connect to the DXCC cluster specified in the config file and continuosly parse
 for new callsigns. Callsigns are looked up against the ClubLog API and compared

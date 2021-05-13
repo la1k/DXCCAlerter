@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # Script that parses DXCC-cluster telnet spots and compares them to clublogs DXCC matrix. If new DXCCs appear the user may be alerted.
 
 import sys
