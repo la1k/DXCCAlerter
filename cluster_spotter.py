@@ -1,4 +1,9 @@
-# Script that parses DXCC-cluster telnet spots and compares them to clublogs DXCC matrix. If new DXCCs appear the user may be alerted.
+"""
+Parse DX cluster telnet spots and print to STDOUT on:
+
+    * Match against pre-defined list of watched calls.
+    * Match against missing DXCC entities in ClubLog.
+"""
 
 import sys
 import telnetlib
@@ -9,8 +14,10 @@ import json
 from configparser import ConfigParser
 from math import radians, cos, sin, asin, sqrt
 
-# Class for keeping track over the time since the last time
-# a specific country and band were spotted.
+"""
+Class for keeping track over the time since the last time
+a specific country and band were spotted.
+"""
 class spot_timekeeper:
     # Map over the times at which a specific (country code, band) were spotted
     spot_times = {};
@@ -18,13 +25,22 @@ class spot_timekeeper:
     # Time threshold
     threshold_seconds = 60*60
 
-    # Check whether the time since the last spot is large enough
-    # for reporting a new spot for this country and band. Updates
-    # the spot time if successful.
-    #
-    # \param country_code Country code
-    # \param band Band
-    # \return True if time difference exceeds the threshold, false otherwise
+    """
+    Check whether the time since the last spot is large enough for reporting a
+    new spot for this country and band. Updates the spot time if successful.
+
+    Parameters
+    ----------
+    country_code:
+        Country code
+    band:
+        Band
+
+    Returns
+    -------
+    exceeds_threshold: boolean
+        True if time difference exceeds the threshold, false otherwise
+    """
     def exceeds_threshold(self, country_code, band):
         curr_time = time.time()
         if (curr_time - self.spot_times.get((country_code, band), 0) > self.threshold_seconds):
@@ -32,10 +48,19 @@ class spot_timekeeper:
             return True
         return False;
 
-# Map frequencies to ham bands between 160 and 6 m.
-#
-# \param freq Frequency in kHz
-# \return Ham radio band (e.g. 80 for 80 meters)
+"""
+Map frequencies to ham bands between 160 and 6 m.
+
+Parameters
+----------
+freq: float
+    Frequency in kHz
+
+Returns
+-------
+band: float
+    Ham radio band (e.g. 80 for 80 meters)
+"""
 def frequency_to_band(freq):
     if 1810.0<frequency<2000.0:
         band = "160"
@@ -63,18 +88,31 @@ def frequency_to_band(freq):
         band = None
     return band
 
-# Map callsign to DXCC number, locator, ..
-#
-# \param callsign Callsign
-# \param api_key ClubLog API key
+"""
+Map callsign to DXCC number, locator, .. using the ClubLog API.
+
+Parameters
+----------
+callsign: str
+    Callsign
+api_key: str
+    ClubLog API key
+"""
 def query_dxcc_info(callsign, api_key):
     return json.load(urlopen("https://secure.clublog.org/dxcc?call=%s&api=%s&full=1" % (callsign,api_key)))
 
-# Check if the DXCC has already been run on the specified band.
-#
-# \param dxcc DXCC number
-# \param band Band (e.g. 80 for 80 meters)
-# \param matrix_filename Filename for JSON structure containing DXCC information obtained from ClubLog
+"""
+Check if the DXCC has already been run on the specified band.
+
+Parameters
+----------
+dxcc: str
+    DXCC number
+band: str
+    Band (e.g. 80 for 80 meters)
+matrix_filename: str
+    Filename for JSON structure containing DXCC information obtained from ClubLog
+"""
 def dxcc_in_matrix(dxcc, band, matrix_filename):
     try:
         with open(matrix_filename) as dxcc_json_data:
@@ -84,7 +122,7 @@ def dxcc_in_matrix(dxcc, band, matrix_filename):
     except KeyError:
         return False
 
-#check number of cli arguments
+# Check number of cli arguments
 if len(sys.argv) <= 1:
     print("Usage: " + sys.argv[0] + " [CONFIG FILE]")
     exit()
